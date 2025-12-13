@@ -148,11 +148,10 @@ export default function HomePage() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2 md:h-3 rounded-full transition-all ${
-                index === currentSlide
+              className={`h-2 md:h-3 rounded-full transition-all ${index === currentSlide
                   ? "bg-white w-6 md:w-8"
                   : "w-2 md:w-3 bg-white/50 hover:bg-white/75"
-              }`}
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

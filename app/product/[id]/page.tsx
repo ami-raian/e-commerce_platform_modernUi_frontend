@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Star, ShoppingCart, Zap } from "lucide-react";
+import { ArrowLeft, Star, ShoppingCart, Zap, Eye, X } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
@@ -34,11 +34,12 @@ export default function ProductPage({
   }, [fetchProductById, id]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState("");
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
   const setDirectPurchaseItem = useCartStore(
     (state) => state.setDirectPurchaseItem
@@ -74,11 +75,98 @@ export default function ProductPage({
   if (loading && !product) {
     return (
       <div className="container-xl py-8">
-        <div className="text-center py-16">
-          <h1 className="section-title mb-4">Loading product...</h1>
-          <p className="text-muted-foreground">
-            Please wait while we load the product.
-          </p>
+        <div className="flex items-center gap-2 mb-8 animate-pulse">
+          <div className="w-5 h-5 bg-gray-300 rounded"></div>
+          <div className="h-4 w-32 bg-gray-300 rounded"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Image Skeleton */}
+          <div className="space-y-3">
+            {/* Main Image Skeleton */}
+            <div className="relative bg-gray-200 h-96 rounded-lg overflow-hidden animate-pulse"></div>
+
+            {/* Thumbnails Skeleton */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="w-16 h-16 rounded bg-gray-200 animate-pulse"
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Info Skeleton */}
+          <div className="space-y-6">
+            {/* Title & Description */}
+            <div className="space-y-4">
+              <div className="h-10 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded w-full animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+              <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* Price */}
+            <div className="space-y-3">
+              <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-12 w-48 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+
+            {/* Stock */}
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
+              <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* Size Selection */}
+            <div className="space-y-3">
+              <div className="h-5 w-28 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-16 h-10 bg-gray-200 rounded-lg animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity */}
+            <div className="space-y-2">
+              <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="w-12 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-12 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Promo Code */}
+            <div className="bg-gray-100 border border-gray-200 rounded-lg p-4 space-y-3 animate-pulse">
+              <div className="h-5 w-40 bg-gray-300 rounded"></div>
+              <div className="flex gap-2">
+                <div className="flex-1 h-10 bg-gray-200 rounded-lg"></div>
+                <div className="w-24 h-10 bg-gray-300 rounded-lg"></div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-4">
+              <div className="w-full h-14 bg-gray-300 rounded-lg animate-pulse"></div>
+              <div className="w-full h-14 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-full h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -129,9 +217,6 @@ export default function ProductPage({
       description: `৳${product.price.toLocaleString("en-BD")} - Quantity: ${quantity}${sizeInfo}`,
       duration: 2000,
     });
-
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   const handleBuyNow = () => {
@@ -178,11 +263,11 @@ export default function ProductPage({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Product Image - main + thumbnails (supports 1-5 images) */}
         <div className="space-y-3">
-          <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center group">
             <button
               aria-label="Previous image"
               onClick={() => setSelectedImageIndex((i) => Math.max(0, i - 1))}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40 cursor-pointer"
             >
               ‹
             </button>
@@ -190,14 +275,28 @@ export default function ProductPage({
             <Image
               src={getImageUrl(
                 product.images?.[selectedImageIndex] ??
-                  product.images?.[0] ??
-                  "/placeholder.svg"
+                product.images?.[0] ??
+                "/placeholder.svg"
               )}
               alt={product.name}
               width={800}
               height={800}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-pointer"
             />
+
+            {/* View Icon on Hover */}
+            <button
+              onClick={() => {
+                setLightboxImageIndex(selectedImageIndex);
+                setLightboxOpen(true);
+              }}
+              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
+              aria-label="View image in full size"
+            >
+              <div className="bg-white rounded-full p-4 shadow-lg">
+                <Eye size={32} className="text-gray-800" />
+              </div>
+            </button>
 
             <button
               aria-label="Next image"
@@ -206,7 +305,7 @@ export default function ProductPage({
                   Math.min((product.images?.length ?? 1) - 1, i + 1)
                 )
               }
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40 cursor-pointer"
             >
               ›
             </button>
@@ -220,18 +319,17 @@ export default function ProductPage({
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-16 h-16 rounded overflow-hidden border ${
-                    selectedImageIndex === idx
-                      ? "border-primary"
-                      : "border-border"
-                  }`}
+                  className={`w-16 h-16 rounded overflow-hidden border cursor-pointer ${selectedImageIndex === idx
+                    ? "border-primary"
+                    : "border-border"
+                    }`}
                 >
                   <Image
                     src={getImageUrl(img)}
                     alt={`${product.name} ${idx + 1}`}
                     width={64}
                     height={64}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer"
                   />
                 </button>
               ))}
@@ -244,9 +342,37 @@ export default function ProductPage({
             <h1 className="text-4xl font-serif font-bold text-balance mb-4">
               {product.name}
             </h1>
-            <p className="text-xl text-muted-foreground">
-              {product.description}
-            </p>
+            <div className="text-base leading-relaxed text-muted-foreground space-y-3">
+              {product.description.split('\n').map((paragraph, idx) => {
+                // Check if line starts with bullet point indicators
+                if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('-') || paragraph.trim().startsWith('*')) {
+                  return (
+                    <li key={idx} className="ml-4 list-disc list-inside">
+                      {paragraph.trim().replace(/^[•\-*]\s*/, '')}
+                    </li>
+                  );
+                }
+                // Check if it's a key-value pair (e.g., "Material: Cotton")
+                else if (paragraph.includes(':') && paragraph.split(':')[0].length < 30) {
+                  const [key, value] = paragraph.split(':');
+                  return (
+                    <p key={idx} className="flex gap-2">
+                      <span className="font-semibold text-foreground">{key.trim()}:</span>
+                      <span>{value?.trim()}</span>
+                    </p>
+                  );
+                }
+                // Regular paragraph
+                else if (paragraph.trim()) {
+                  return (
+                    <p key={idx} className="text-foreground/90">
+                      {paragraph.trim()}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+            </div>
           </div>
 
           {/* Rating */}
@@ -333,11 +459,10 @@ export default function ProductPage({
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${
-                      selectedSize === size
-                        ? "border-primary bg-primary text-primary-foreground shadow-md"
-                        : "border-border hover:border-primary hover:bg-accent"
-                    }`}
+                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${selectedSize === size
+                      ? "border-primary bg-primary text-primary-foreground shadow-md"
+                      : "border-border hover:border-primary hover:bg-accent"
+                      }`}
                   >
                     {size}
                   </button>
@@ -388,11 +513,10 @@ export default function ProductPage({
             </div>
             {promoMessage && (
               <p
-                className={`text-sm font-medium ${
-                  promoMessage.includes("Invalid")
-                    ? "text-red-500"
-                    : "text-green-600"
-                }`}
+                className={`text-sm font-medium ${promoMessage.includes("Invalid")
+                  ? "text-red-500"
+                  : "text-green-600"
+                  }`}
               >
                 {promoMessage}
               </p>
@@ -474,6 +598,68 @@ export default function ProductPage({
           </div>
         </div>
       </div>
+
+      {/* Image Lightbox Modal */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm cursor-pointer"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50 cursor-pointer"
+            aria-label="Close lightbox"
+          >
+            <X size={32} />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxImageIndex((i) => Math.max(0, i - 1));
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50 cursor-pointer"
+            disabled={lightboxImageIndex === 0}
+            aria-label="Previous image"
+          >
+            <span className="text-3xl">‹</span>
+          </button>
+
+          <div
+            className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={getImageUrl(
+                product.images?.[lightboxImageIndex] ??
+                product.images?.[0] ??
+                "/placeholder.svg"
+              )}
+              alt={`${product.name} - Image ${lightboxImageIndex + 1}`}
+              width={1920}
+              height={1920}
+              className="max-w-full max-h-full object-contain rounded-lg cursor-default"
+            />
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+              {lightboxImageIndex + 1} / {product.images?.length ?? 1}
+            </div>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxImageIndex((i) =>
+                Math.min((product.images?.length ?? 1) - 1, i + 1)
+              );
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50 cursor-pointer"
+            disabled={lightboxImageIndex === (product.images?.length ?? 1) - 1}
+            aria-label="Next image"
+          >
+            <span className="text-3xl">›</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
