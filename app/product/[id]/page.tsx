@@ -342,9 +342,37 @@ export default function ProductPage({
             <h1 className="text-4xl font-serif font-bold text-balance mb-4">
               {product.name}
             </h1>
-            <p className="text-xl text-muted-foreground">
-              {product.description}
-            </p>
+            <div className="text-base leading-relaxed text-muted-foreground space-y-3">
+              {product.description.split('\n').map((paragraph, idx) => {
+                // Check if line starts with bullet point indicators
+                if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('-') || paragraph.trim().startsWith('*')) {
+                  return (
+                    <li key={idx} className="ml-4 list-disc list-inside">
+                      {paragraph.trim().replace(/^[•\-*]\s*/, '')}
+                    </li>
+                  );
+                }
+                // Check if it's a key-value pair (e.g., "Material: Cotton")
+                else if (paragraph.includes(':') && paragraph.split(':')[0].length < 30) {
+                  const [key, value] = paragraph.split(':');
+                  return (
+                    <p key={idx} className="flex gap-2">
+                      <span className="font-semibold text-foreground">{key.trim()}:</span>
+                      <span>{value?.trim()}</span>
+                    </p>
+                  );
+                }
+                // Regular paragraph
+                else if (paragraph.trim()) {
+                  return (
+                    <p key={idx} className="text-foreground/90">
+                      {paragraph.trim()}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+            </div>
           </div>
 
           {/* Rating */}
