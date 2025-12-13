@@ -153,9 +153,9 @@ export default function AdminProductsPage() {
                   Stock: {product.stock}
                 </span>
               </div>
-              {product.discount > 0 && (
+              {product.discountPercent > 0 && (
                 <div className="mt-2 text-sm text-green-600">
-                  {product.discount}% off
+                  {Math.round(product.discountPercent)}% off
                 </div>
               )}
             </CardContent>
@@ -256,10 +256,10 @@ function ProductForm({
   const [formData, setFormData] = useState({
     name: product?.name || "",
     description: product?.description || "",
+    mainPrice: product?.mainPrice || 0,
     price: product?.price || 0,
     category: product?.category || "electronics",
     stock: product?.stock || 0,
-    discount: product?.discount || 0,
     isFlashSale: product?.isFlashSale || false,
     subCategory: product?.subCategory || null,
     gender: product?.gender || null,
@@ -333,7 +333,22 @@ function ProductForm({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="price">Price *</Label>
+            <Label htmlFor="mainPrice">Original Price *</Label>
+            <Input
+              id="mainPrice"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.mainPrice}
+              onChange={(e) =>
+                setFormData({ ...formData, mainPrice: parseFloat(e.target.value) })
+              }
+              required
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="price">Selling Price *</Label>
             <Input
               id="price"
               type="number"
@@ -342,20 +357,6 @@ function ProductForm({
               value={formData.price}
               onChange={(e) =>
                 setFormData({ ...formData, price: parseFloat(e.target.value) })
-              }
-              required
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="stock">Stock *</Label>
-            <Input
-              id="stock"
-              type="number"
-              min="0"
-              value={formData.stock}
-              onChange={(e) =>
-                setFormData({ ...formData, stock: parseInt(e.target.value) })
               }
               required
             />
@@ -385,16 +386,16 @@ function ProductForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="discount">Discount (%)</Label>
+            <Label htmlFor="stock">Stock *</Label>
             <Input
-              id="discount"
+              id="stock"
               type="number"
               min="0"
-              max="100"
-              value={formData.discount}
+              value={formData.stock}
               onChange={(e) =>
-                setFormData({ ...formData, discount: parseInt(e.target.value) })
+                setFormData({ ...formData, stock: parseInt(e.target.value) })
               }
+              required
             />
           </div>
         </div>
