@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Star, ShoppingCart, Zap } from "lucide-react";
+import { ArrowLeft, Star, ShoppingCart, Zap, Eye, X } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
@@ -34,11 +34,12 @@ export default function ProductPage({
   }, [fetchProductById, id]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState("");
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
   const addItem = useCartStore((state) => state.addItem);
   const setDirectPurchaseItem = useCartStore(
     (state) => state.setDirectPurchaseItem
@@ -129,9 +130,6 @@ export default function ProductPage({
       description: `৳${product.price.toLocaleString("en-BD")} - Quantity: ${quantity}${sizeInfo}`,
       duration: 2000,
     });
-
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   const handleBuyNow = () => {
@@ -178,7 +176,7 @@ export default function ProductPage({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Product Image - main + thumbnails (supports 1-5 images) */}
         <div className="space-y-3">
-          <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center group">
             <button
               aria-label="Previous image"
               onClick={() => setSelectedImageIndex((i) => Math.max(0, i - 1))}
@@ -198,6 +196,20 @@ export default function ProductPage({
               height={800}
               className="w-full h-full object-cover"
             />
+
+            {/* View Icon on Hover */}
+            <button
+              onClick={() => {
+                setLightboxImageIndex(selectedImageIndex);
+                setLightboxOpen(true);
+              }}
+              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+              aria-label="View image in full size"
+            >
+              <div className="bg-white rounded-full p-4 shadow-lg">
+                <Eye size={32} className="text-gray-800" />
+              </div>
+            </button>
 
             <button
               aria-label="Next image"
@@ -474,6 +486,68 @@ export default function ProductPage({
           </div>
         </div>
       </div>
+
+      {/* Image Lightbox Modal */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+            aria-label="Close lightbox"
+          >
+            <X size={32} />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxImageIndex((i) => Math.max(0, i - 1));
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50"
+            disabled={lightboxImageIndex === 0}
+            aria-label="Previous image"
+          >
+            <span className="text-3xl">‹</span>
+          </button>
+
+          <div
+            className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={getImageUrl(
+                product.images?.[lightboxImageIndex] ??
+                  product.images?.[0] ??
+                  "/placeholder.svg"
+              )}
+              alt={`${product.name} - Image ${lightboxImageIndex + 1}`}
+              width={1920}
+              height={1920}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+              {lightboxImageIndex + 1} / {product.images?.length ?? 1}
+            </div>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxImageIndex((i) =>
+                Math.min((product.images?.length ?? 1) - 1, i + 1)
+              );
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50"
+            disabled={lightboxImageIndex === (product.images?.length ?? 1) - 1}
+            aria-label="Next image"
+          >
+            <span className="text-3xl">›</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
