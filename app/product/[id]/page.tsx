@@ -180,7 +180,7 @@ export default function ProductPage({
             <button
               aria-label="Previous image"
               onClick={() => setSelectedImageIndex((i) => Math.max(0, i - 1))}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40 cursor-pointer"
             >
               ‹
             </button>
@@ -188,13 +188,13 @@ export default function ProductPage({
             <Image
               src={getImageUrl(
                 product.images?.[selectedImageIndex] ??
-                  product.images?.[0] ??
-                  "/placeholder.svg"
+                product.images?.[0] ??
+                "/placeholder.svg"
               )}
               alt={product.name}
               width={800}
               height={800}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-pointer"
             />
 
             {/* View Icon on Hover */}
@@ -203,7 +203,7 @@ export default function ProductPage({
                 setLightboxImageIndex(selectedImageIndex);
                 setLightboxOpen(true);
               }}
-              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
               aria-label="View image in full size"
             >
               <div className="bg-white rounded-full p-4 shadow-lg">
@@ -218,7 +218,7 @@ export default function ProductPage({
                   Math.min((product.images?.length ?? 1) - 1, i + 1)
                 )
               }
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-black/30 text-white rounded-full hover:bg-black/40 cursor-pointer"
             >
               ›
             </button>
@@ -232,18 +232,17 @@ export default function ProductPage({
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-16 h-16 rounded overflow-hidden border ${
-                    selectedImageIndex === idx
-                      ? "border-primary"
-                      : "border-border"
-                  }`}
+                  className={`w-16 h-16 rounded overflow-hidden border cursor-pointer ${selectedImageIndex === idx
+                    ? "border-primary"
+                    : "border-border"
+                    }`}
                 >
                   <Image
                     src={getImageUrl(img)}
                     alt={`${product.name} ${idx + 1}`}
                     width={64}
                     height={64}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer"
                   />
                 </button>
               ))}
@@ -345,11 +344,10 @@ export default function ProductPage({
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${
-                      selectedSize === size
-                        ? "border-primary bg-primary text-primary-foreground shadow-md"
-                        : "border-border hover:border-primary hover:bg-accent"
-                    }`}
+                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${selectedSize === size
+                      ? "border-primary bg-primary text-primary-foreground shadow-md"
+                      : "border-border hover:border-primary hover:bg-accent"
+                      }`}
                   >
                     {size}
                   </button>
@@ -400,11 +398,10 @@ export default function ProductPage({
             </div>
             {promoMessage && (
               <p
-                className={`text-sm font-medium ${
-                  promoMessage.includes("Invalid")
-                    ? "text-red-500"
-                    : "text-green-600"
-                }`}
+                className={`text-sm font-medium ${promoMessage.includes("Invalid")
+                  ? "text-red-500"
+                  : "text-green-600"
+                  }`}
               >
                 {promoMessage}
               </p>
@@ -490,12 +487,12 @@ export default function ProductPage({
       {/* Image Lightbox Modal */}
       {lightboxOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm cursor-pointer"
           onClick={() => setLightboxOpen(false)}
         >
           <button
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50 cursor-pointer"
             aria-label="Close lightbox"
           >
             <X size={32} />
@@ -506,7 +503,7 @@ export default function ProductPage({
               e.stopPropagation();
               setLightboxImageIndex((i) => Math.max(0, i - 1));
             }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50"
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50 cursor-pointer"
             disabled={lightboxImageIndex === 0}
             aria-label="Previous image"
           >
@@ -520,13 +517,13 @@ export default function ProductPage({
             <Image
               src={getImageUrl(
                 product.images?.[lightboxImageIndex] ??
-                  product.images?.[0] ??
-                  "/placeholder.svg"
+                product.images?.[0] ??
+                "/placeholder.svg"
               )}
               alt={`${product.name} - Image ${lightboxImageIndex + 1}`}
               width={1920}
               height={1920}
-              className="max-w-full max-h-full object-contain rounded-lg"
+              className="max-w-full max-h-full object-contain rounded-lg cursor-default"
             />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
               {lightboxImageIndex + 1} / {product.images?.length ?? 1}
@@ -540,7 +537,7 @@ export default function ProductPage({
                 Math.min((product.images?.length ?? 1) - 1, i + 1)
               );
             }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50"
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-50 cursor-pointer"
             disabled={lightboxImageIndex === (product.images?.length ?? 1) - 1}
             aria-label="Next image"
           >
