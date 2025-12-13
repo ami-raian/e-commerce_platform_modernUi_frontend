@@ -75,11 +75,98 @@ export default function ProductPage({
   if (loading && !product) {
     return (
       <div className="container-xl py-8">
-        <div className="text-center py-16">
-          <h1 className="section-title mb-4">Loading product...</h1>
-          <p className="text-muted-foreground">
-            Please wait while we load the product.
-          </p>
+        <div className="flex items-center gap-2 mb-8 animate-pulse">
+          <div className="w-5 h-5 bg-gray-300 rounded"></div>
+          <div className="h-4 w-32 bg-gray-300 rounded"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Image Skeleton */}
+          <div className="space-y-3">
+            {/* Main Image Skeleton */}
+            <div className="relative bg-gray-200 h-96 rounded-lg overflow-hidden animate-pulse"></div>
+
+            {/* Thumbnails Skeleton */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="w-16 h-16 rounded bg-gray-200 animate-pulse"
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Info Skeleton */}
+          <div className="space-y-6">
+            {/* Title & Description */}
+            <div className="space-y-4">
+              <div className="h-10 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded w-full animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                ))}
+              </div>
+              <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* Price */}
+            <div className="space-y-3">
+              <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-12 w-48 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+
+            {/* Stock */}
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
+              <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* Size Selection */}
+            <div className="space-y-3">
+              <div className="h-5 w-28 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-16 h-10 bg-gray-200 rounded-lg animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity */}
+            <div className="space-y-2">
+              <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="w-12 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-12 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Promo Code */}
+            <div className="bg-gray-100 border border-gray-200 rounded-lg p-4 space-y-3 animate-pulse">
+              <div className="h-5 w-40 bg-gray-300 rounded"></div>
+              <div className="flex gap-2">
+                <div className="flex-1 h-10 bg-gray-200 rounded-lg"></div>
+                <div className="w-24 h-10 bg-gray-300 rounded-lg"></div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-4">
+              <div className="w-full h-14 bg-gray-300 rounded-lg animate-pulse"></div>
+              <div className="w-full h-14 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="w-full h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
