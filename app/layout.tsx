@@ -10,6 +10,8 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { Toaster } from "@/components/ui/sonner";
+import { MetaPixel } from "@/components/providers/meta-pixel-provider";
+import { MetaPageView } from "@/components/providers/meta-page-view-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({
@@ -115,6 +117,7 @@ export default function RootLayout({
             }),
           }}
         />
+        <MetaPixel />
       </head>
       <body
         className={`${inter.variable} ${playfair.variable}`}
@@ -124,6 +127,7 @@ export default function RootLayout({
           <AuthProvider>
             <Suspense fallback={null}>
               <ProgressBarProvider />
+              <MetaPageView />
             </Suspense>
             <Navbar />
             <main className="min-h-screen">{children}</main>
