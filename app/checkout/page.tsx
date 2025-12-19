@@ -7,6 +7,7 @@ import { useCartStore } from "@/lib/cart-store"
 import { usePromoStore } from "@/lib/promo-store"
 import { CheckoutForm } from "@/components/checkout/checkout-form"
 import { PromoInput } from "@/components/promo/promo-input"
+import { CheckoutTracker } from "@/components/tracking/checkout-tracker"
 
 export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false)
@@ -49,6 +50,8 @@ export default function CheckoutPage() {
 
   return (
     <div className="container-xl py-8">
+      <CheckoutTracker />
+
       <div className="flex items-center gap-2 mb-8">
         <Link href="/cart" className="flex items-center gap-2 text-primary hover:underline">
           <ArrowLeft size={20} />

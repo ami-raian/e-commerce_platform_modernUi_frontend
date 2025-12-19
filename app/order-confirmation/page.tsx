@@ -3,20 +3,51 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { useCartStore } from "@/lib/cart-store";
+import { OrderTracker } from "@/components/tracking/order-tracker";
 
 export default function OrderConfirmationPage() {
   const [mounted, setMounted] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
+  const items = useCartStore((state) => state.items);
+  const directPurchaseItem = useCartStore((state) => state.directPurchaseItem);
+  const getTotal = useCartStore((state) => state.getTotal);
 
   useEffect(() => {
     setMounted(true);
+    // Generate order number once on mount
+    setOrderNumber(`ORD-${Date.now().toString().slice(-8)}`);
   }, []);
 
   if (!mounted) return null;
 
-  const orderNumber = `ORD-${Date.now().toString().slice(-8)}`;
+  // Get order items (direct purchase or cart items)
+  const orderItems = directPurchaseItem
+    ? [directPurchaseItem]
+    : items.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+
+  const totalAmount = directPurchaseItem
+    ? directPurchaseItem.price * directPurchaseItem.quantity
+    : getTotal();
 
   return (
     <div className="container-xl py-16 md:py-24">
+      {/* Track order with Meta Pixel - Only fires once due to deduplication */}
+      {orderNumber && orderItems.length > 0 && (
+        <OrderTracker
+          orderId={orderNumber}
+          items={orderItems}
+          totalAmount={totalAmount}
+          paymentMethod="cod"
+          usePurchaseEvent={false}
+        />
+      )}
+
       <div className="text-center space-y-8 max-w-2xl mx-auto">
         <div className="flex justify-center">
           <CheckCircle size={64} className="text-success" />
