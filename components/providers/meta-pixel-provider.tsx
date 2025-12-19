@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * MetaPixel Component
@@ -7,9 +7,9 @@
  * Usage: Place in app/layout.tsx inside <head> or at top of <body>
  */
 
-import Script from 'next/script';
-import { useEffect } from 'react';
-import { initMetaPixel, cleanupOldTrackingRecords } from '@/lib/metaPixel';
+import Script from "next/script";
+import { useEffect } from "react";
+import { initMetaPixel, cleanupOldTrackingRecords } from "@/lib/metaPixel";
 
 interface MetaPixelProps {
   pixelId?: string;
@@ -25,7 +25,9 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
 
   // Don't render if no Pixel ID
   if (!pixelID) {
-    console.warn('[Meta Pixel] NEXT_PUBLIC_META_PIXEL_ID not set. Pixel not loaded.');
+    console.warn(
+      "[Meta Pixel] NEXT_PUBLIC_META_PIXEL_ID not set. Pixel not loaded."
+    );
     return null;
   }
 
@@ -49,14 +51,15 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         }}
       />
 
-      {/* Initialize Pixel */}
+      {/* Initialize Pixel and Track PageView */}
       <Script
         id="meta-pixel-init"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             fbq('init', '${pixelID}');
-            console.log('[Meta Pixel] Initialized: ${pixelID}');
+            fbq('track', 'PageView');
+            console.log('[Meta Pixel] Initialized and PageView tracked: ${pixelID}');
           `,
         }}
       />
@@ -66,7 +69,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         <img
           height="1"
           width="1"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           src={`https://www.facebook.com/tr?id=${pixelID}&ev=PageView&noscript=1`}
           alt=""
         />
