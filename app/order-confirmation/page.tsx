@@ -24,7 +24,7 @@ export default function OrderConfirmationPage() {
   // Get order items (direct purchase or cart items)
   const orderItems = directPurchaseItem
     ? [directPurchaseItem]
-    : items.map(item => ({
+    : items.map((item) => ({
         productId: item.productId,
         name: item.name,
         price: item.price,
@@ -44,7 +44,7 @@ export default function OrderConfirmationPage() {
           items={orderItems}
           totalAmount={totalAmount}
           paymentMethod="cod"
-          usePurchaseEvent={false}
+          usePurchaseEvent={true}
         />
       )}
 

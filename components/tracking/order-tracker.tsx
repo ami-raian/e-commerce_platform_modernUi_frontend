@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * OrderTracker Component
@@ -9,8 +9,12 @@
  * Usage: Import and use in app/order-confirmation/page.tsx
  */
 
-import { useEffect } from 'react';
-import { trackOrderPlaced, trackPurchase, trackEventOnce } from '@/lib/metaPixel';
+import { useEffect } from "react";
+import {
+  trackOrderPlaced,
+  trackPurchase,
+  trackEventOnce,
+} from "@/lib/metaPixel";
 
 interface OrderItem {
   productId: string;
@@ -23,7 +27,7 @@ interface OrderTrackerProps {
   orderId: string;
   items: OrderItem[];
   totalAmount: number;
-  paymentMethod?: 'bkash' | 'nagad' | 'rocket' | 'cod';
+  paymentMethod?: "bkash" | "nagad" | "rocket" | "cod";
   /**
    * Set to true if you want to fire the standard "Purchase" event instead of "OrderPlaced"
    * Use this ONLY if payment is confirmed (not for manual payment methods)
@@ -35,12 +39,14 @@ export function OrderTracker({
   orderId,
   items,
   totalAmount,
-  paymentMethod = 'cod',
+  paymentMethod = "cod",
   usePurchaseEvent = false,
 }: OrderTrackerProps) {
   useEffect(() => {
     if (!orderId || items.length === 0) {
-      console.warn('[OrderTracker] Missing orderId or items. Event not tracked.');
+      console.warn(
+        "[OrderTracker] Missing orderId or items. Event not tracked."
+      );
       return;
     }
 
@@ -67,7 +73,7 @@ export function OrderTracker({
             contents: contents,
             num_items: numItems,
             value: totalAmount,
-            currency: 'BDT',
+            currency: "BDT",
           });
         },
         60 // TTL: 60 minutes
@@ -83,8 +89,12 @@ export function OrderTracker({
             content_ids: contentIds,
             num_items: numItems,
             value: totalAmount,
-            currency: 'BDT',
+            currency: "BDT",
           });
+          console.log(
+            "[OrderTracker] OrderPlaced event fired for order:",
+            orderId
+          );
         },
         60 // TTL: 60 minutes
       );
