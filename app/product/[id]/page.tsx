@@ -111,7 +111,10 @@ export default function ProductPage({
             <div className="flex items-center gap-2">
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+                  <div
+                    key={i}
+                    className="w-5 h-5 bg-gray-200 rounded animate-pulse"
+                  ></div>
                 ))}
               </div>
               <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
@@ -253,7 +256,15 @@ export default function ProductPage({
 
   return (
     <div className="container-xl py-8">
-      <ProductViewTracker product={product} />
+      <ProductViewTracker
+        product={{
+          id: product._id,
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          discountPercentage: product.discountPercent,
+        }}
+      />
 
       <Link
         href="/products"
@@ -278,8 +289,8 @@ export default function ProductPage({
             <Image
               src={getImageUrl(
                 product.images?.[selectedImageIndex] ??
-                product.images?.[0] ??
-                "/placeholder.svg"
+                  product.images?.[0] ??
+                  "/placeholder.svg"
               )}
               alt={product.name}
               width={800}
@@ -322,10 +333,11 @@ export default function ProductPage({
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-16 h-16 rounded overflow-hidden border cursor-pointer ${selectedImageIndex === idx
-                    ? "border-primary"
-                    : "border-border"
-                    }`}
+                  className={`w-16 h-16 rounded overflow-hidden border cursor-pointer ${
+                    selectedImageIndex === idx
+                      ? "border-primary"
+                      : "border-border"
+                  }`}
                 >
                   <Image
                     src={getImageUrl(img)}
@@ -346,21 +358,30 @@ export default function ProductPage({
               {product.name}
             </h1>
             <div className="text-base leading-relaxed text-muted-foreground space-y-3">
-              {product.description.split('\n').map((paragraph, idx) => {
+              {product.description.split("\n").map((paragraph, idx) => {
                 // Check if line starts with bullet point indicators
-                if (paragraph.trim().startsWith('•') || paragraph.trim().startsWith('-') || paragraph.trim().startsWith('*')) {
+                if (
+                  paragraph.trim().startsWith("•") ||
+                  paragraph.trim().startsWith("-") ||
+                  paragraph.trim().startsWith("*")
+                ) {
                   return (
                     <li key={idx} className="ml-4 list-disc list-inside">
-                      {paragraph.trim().replace(/^[•\-*]\s*/, '')}
+                      {paragraph.trim().replace(/^[•\-*]\s*/, "")}
                     </li>
                   );
                 }
                 // Check if it's a key-value pair (e.g., "Material: Cotton")
-                else if (paragraph.includes(':') && paragraph.split(':')[0].length < 30) {
-                  const [key, value] = paragraph.split(':');
+                else if (
+                  paragraph.includes(":") &&
+                  paragraph.split(":")[0].length < 30
+                ) {
+                  const [key, value] = paragraph.split(":");
                   return (
                     <p key={idx} className="flex gap-2">
-                      <span className="font-semibold text-foreground">{key.trim()}:</span>
+                      <span className="font-semibold text-foreground">
+                        {key.trim()}:
+                      </span>
                       <span>{value?.trim()}</span>
                     </p>
                   );
@@ -462,10 +483,11 @@ export default function ProductPage({
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${selectedSize === size
-                      ? "border-primary bg-primary text-primary-foreground shadow-md"
-                      : "border-border hover:border-primary hover:bg-accent"
-                      }`}
+                    className={`px-4 py-2 border rounded-lg font-medium transition-all ${
+                      selectedSize === size
+                        ? "border-primary bg-primary text-primary-foreground shadow-md"
+                        : "border-border hover:border-primary hover:bg-accent"
+                    }`}
                   >
                     {size}
                   </button>
@@ -516,10 +538,11 @@ export default function ProductPage({
             </div>
             {promoMessage && (
               <p
-                className={`text-sm font-medium ${promoMessage.includes("Invalid")
-                  ? "text-red-500"
-                  : "text-green-600"
-                  }`}
+                className={`text-sm font-medium ${
+                  promoMessage.includes("Invalid")
+                    ? "text-red-500"
+                    : "text-green-600"
+                }`}
               >
                 {promoMessage}
               </p>
@@ -635,8 +658,8 @@ export default function ProductPage({
             <Image
               src={getImageUrl(
                 product.images?.[lightboxImageIndex] ??
-                product.images?.[0] ??
-                "/placeholder.svg"
+                  product.images?.[0] ??
+                  "/placeholder.svg"
               )}
               alt={`${product.name} - Image ${lightboxImageIndex + 1}`}
               width={1920}
