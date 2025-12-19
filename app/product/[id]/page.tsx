@@ -9,6 +9,7 @@ import { useProductStore, type Product } from "@/lib/product-store";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/api";
 import { toast } from "sonner";
+import { ProductViewTracker } from "@/components/tracking/product-view-tracker";
 
 export default function ProductPage({
   params,
@@ -252,6 +253,8 @@ export default function ProductPage({
 
   return (
     <div className="container-xl py-8">
+      <ProductViewTracker product={product} />
+
       <Link
         href="/products"
         className="flex items-center gap-2 text-primary hover:underline mb-8"

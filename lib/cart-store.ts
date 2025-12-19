@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { trackAddToCart } from "./metaPixel"
 
 export interface CartItem {
   productId: string
@@ -38,6 +39,17 @@ export const useCartStore = create<CartStore>()(
           const existingItem = state.items.find(
             (i) => i.productId === item.productId && i.size === item.size
           )
+
+          // Track AddToCart event
+          trackAddToCart({
+            content_name: item.name,
+            content_ids: [item.productId],
+            content_type: 'product',
+            value: item.price * item.quantity,
+            num_items: item.quantity,
+            currency: 'BDT',
+          })
+
           if (existingItem) {
             return {
               items: state.items.map((i) =>
