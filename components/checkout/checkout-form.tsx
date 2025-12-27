@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { OrderConfirmationModal } from "./order-confirmation-modal";
 
 interface CheckoutFormProps {
   total: number;
@@ -49,6 +50,7 @@ export function CheckoutForm({
   const [isFormValid, setIsFormValid] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -99,7 +101,7 @@ export function CheckoutForm({
     },
   ];
 
-  const handlePlaceOrder = async () => {
+  const handleInitiateOrder = () => {
     if (!selectedPayment) {
       toast.error("Please select a payment method");
       return;
@@ -114,6 +116,18 @@ export function CheckoutForm({
       return;
     }
 
+    // Show confirmation modal
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmOrder = async () => {
+    const paymentMethod = paymentOptions.find(
+      (opt) => opt.id === selectedPayment
+    );
+
+    if (!paymentMethod) return;
+
+    setShowConfirmModal(false);
     setOrderPlaced(true);
     setSendingEmail(true);
 
@@ -179,10 +193,33 @@ export function CheckoutForm({
       );
     } finally {
       setSendingEmail(false);
+
+      // Generate order number
+      const orderNumber = `ORD-${Date.now().toString().slice(-8)}`;
+
+      // Store order data in sessionStorage for the confirmation page
+      sessionStorage.setItem('lastOrder', JSON.stringify({
+        orderNumber,
+        customerName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        items: cartItems,
+        subtotal,
+        promoDiscount,
+        appliedPromoCode,
+        shipping,
+        shippingLocation,
+        total,
+        paymentMethod: paymentMethod.name,
+        orderDate: new Date().toISOString()
+      }));
+
       setTimeout(() => {
         clearCart();
         setDirectPurchaseItem(null);
-        router.push("/");
+        router.push("/order-confirmation");
       }, 2000);
     }
   };
@@ -374,7 +411,7 @@ export function CheckoutForm({
             )}
 
             <button
-              onClick={handlePlaceOrder}
+              onClick={handleInitiateOrder}
               disabled={orderPlaced || sendingEmail}
               className="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -397,6 +434,24 @@ export function CheckoutForm({
           </div>
         )}
       </div>
+
+      {/* Order Confirmation Modal */}
+      <OrderConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmOrder}
+        customerName={customerName}
+        phone={formData.phone}
+        address={formData.address}
+        city={formData.city}
+        cartItems={cartItems}
+        total={total}
+        paymentMethod={
+          paymentOptions.find((opt) => opt.id === selectedPayment)?.name || ""
+        }
+        shippingLocation={shippingLocation}
+        isProcessing={sendingEmail}
+      />
     </>
   );
 }
