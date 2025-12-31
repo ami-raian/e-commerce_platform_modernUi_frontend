@@ -82,7 +82,7 @@ export default function ProductPage({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Image Skeleton */}
+          {/* Image Skeleton + Title/Description/Rating below */}
           <div className="space-y-3">
             {/* Main Image Skeleton */}
             <div className="relative bg-gray-200 h-96 rounded-lg overflow-hidden animate-pulse"></div>
@@ -96,34 +96,44 @@ export default function ProductPage({
                 ></div>
               ))}
             </div>
+
+            {/* Title, Description, Rating - Below images */}
+            <div className="pt-6 space-y-4">
+              {/* Rating */}
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className="w-5 h-5 bg-gray-200 rounded animate-pulse"
+                    ></div>
+                  ))}
+                </div>
+                <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+
+              {/* Title */}
+              <div className="h-10 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+              
+              {/* Description */}
+              <div className="space-y-2">
+                <div className="h-5 bg-gray-200 rounded w-full animate-pulse"></div>
+                <div className="h-5 bg-gray-200 rounded w-5/6 animate-pulse"></div>
+                <div className="h-5 bg-gray-200 rounded w-4/5 animate-pulse"></div>
+              </div>
+            </div>
           </div>
 
           {/* Product Info Skeleton */}
           <div className="space-y-6">
-            {/* Title & Description */}
-            <div className="space-y-4">
-              <div className="h-10 bg-gray-300 rounded w-3/4 animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded w-full animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded w-5/6 animate-pulse"></div>
-            </div>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div
-                    key={i}
-                    className="w-5 h-5 bg-gray-200 rounded animate-pulse"
-                  ></div>
-                ))}
+            {/* Price Box */}
+            <div className="bg-gray-100 border border-gray-200 rounded-lg p-5 space-y-3 animate-pulse">
+              <div className="h-4 w-16 bg-gray-300 rounded"></div>
+              <div className="flex items-center gap-4">
+                <div className="h-6 w-24 bg-gray-200 rounded"></div>
+                <div className="h-12 w-32 bg-gray-300 rounded"></div>
               </div>
-              <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-
-            {/* Price */}
-            <div className="space-y-3">
-              <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-12 w-48 bg-gray-300 rounded animate-pulse"></div>
+              <div className="bg-gray-200 rounded-md p-3 h-10"></div>
             </div>
 
             {/* Stock */}
