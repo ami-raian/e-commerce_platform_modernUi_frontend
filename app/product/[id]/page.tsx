@@ -349,12 +349,28 @@ export default function ProductPage({
                 </button>
               ))}
           </div>
-        </div>
 
-        {/* Product Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-4xl font-serif font-bold text-balance mb-4">
+          {/* Title and Description - Moved below images */}
+          <div className="pt-6 space-y-4">
+            {/* Rating - Moved above title */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={20}
+                    className={
+                      i < Math.floor(product.rating)
+                        ? "fill-primary text-primary"
+                        : "text-border"
+                    }
+                  />
+                ))}
+              </div>
+              <span className="text-lg font-semibold">{product.rating} / 5</span>
+            </div>
+
+            <h1 className="text-4xl font-serif font-bold text-balance">
               {product.name}
             </h1>
             <div className="text-base leading-relaxed text-muted-foreground space-y-3">
@@ -398,24 +414,10 @@ export default function ProductPage({
               })}
             </div>
           </div>
+        </div>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={20}
-                  className={
-                    i < Math.floor(product.rating)
-                      ? "fill-primary text-primary"
-                      : "text-border"
-                  }
-                />
-              ))}
-            </div>
-            <span className="text-lg font-semibold">{product.rating} / 5</span>
-          </div>
+        {/* Product Info */}
+        <div className="space-y-6">
 
           {/* Price */}
           <div className="space-y-2">
