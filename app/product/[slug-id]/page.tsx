@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 import { ArrowLeft, Star, ShoppingCart, Zap, Eye, X } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useProductStore, type Product } from "@/lib/product-store";
@@ -10,29 +11,45 @@ import Image from "next/image";
 import { getImageUrl } from "@/lib/api";
 import { toast } from "sonner";
 import { ProductViewTracker } from "@/components/tracking/product-view-tracker";
+import { extractIdFromSlug, getProductUrl } from "@/lib/utils";
 
 export default function ProductPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ "slug-id": string }>;
 }) {
-  const { id } = use(params);
+  const { "slug-id": slugId } = use(params);
+  const id = extractIdFromSlug(slugId);
   const router = useRouter();
   const { loading, fetchProductById } = useProductStore();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       const p = await fetchProductById(id);
-      if (!cancelled) setProduct(p);
+      if (!cancelled) {
+        setProduct(p);
+        setIsInitialLoad(false);
+        // Update document title for SEO
+        if (p) {
+          document.title = `${p.name} - ৳${p.price.toLocaleString("en-BD")} | Margen`;
+          
+          // Redirect to proper SEO URL if user accessed with just ID
+          const properUrl = getProductUrl(id, p.name);
+          if (slugId === id && properUrl !== `/product/${slugId}`) {
+            router.replace(properUrl);
+          }
+        }
+      }
     };
     load();
     return () => {
       cancelled = true;
     };
-  }, [fetchProductById, id]);
+  }, [fetchProductById, id, slugId, router]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [promoCode, setPromoCode] = useState("");
@@ -73,7 +90,9 @@ export default function ProductPage({
     }
     return product.price;
   };
-  if (loading && !product) {
+  
+  // Show skeleton during initial load
+  if (isInitialLoad || (loading && !product)) {
     return (
       <div className="container-xl py-8">
         <div className="flex items-center gap-2 mb-8 animate-pulse">
@@ -186,7 +205,8 @@ export default function ProductPage({
     );
   }
 
-  if (!product) {
+  // Show not found only after loading is complete
+  if (!isInitialLoad && !loading && !product) {
     return (
       <div className="container-xl py-8">
         <Link
@@ -204,6 +224,22 @@ export default function ProductPage({
           <Link href="/products" className="btn-primary inline-block">
             Continue Shopping
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // If still loading or no product yet, show skeleton
+  if (!product) {
+    return (
+      <div className="container-xl py-8">
+        <div className="flex items-center gap-2 mb-8 animate-pulse">
+          <div className="w-5 h-5 bg-gray-300 rounded"></div>
+          <div className="h-4 w-32 bg-gray-300 rounded"></div>
+        </div>
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading product...</p>
         </div>
       </div>
     );

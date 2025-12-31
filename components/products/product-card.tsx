@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Star, ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { toast } from "sonner";
+import { getProductUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   id: string;
@@ -43,7 +44,7 @@ export function ProductCard({
   };
 
   return (
-    <Link href={`/product/${id}`} className="group cursor-pointer">
+    <Link href={getProductUrl(id, name)} className="group cursor-pointer">
       <div className="card overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
         <div className="bg-accent h-48 flex items-center justify-center overflow-hidden rounded-lg mb-4 relative">
           <img
