@@ -245,7 +245,9 @@ export default function OrderConfirmationPage() {
           </h3>
           <p className="text-sm text-blue-900 dark:text-blue-100">
             Your order will be delivered via courier service within{" "}
-            <span className="font-semibold">3-4 business days</span>.
+            <span className="font-semibold">
+              {orderData.shippingLocation === "inside-dhaka" ? "1 day" : "2-3 days"}
+            </span>.
             You will receive a confirmation email and tracking information shortly.
           </p>
         </div>

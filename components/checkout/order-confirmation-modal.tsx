@@ -144,7 +144,9 @@ export function OrderConfirmationModal({
           <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <p className="text-sm text-center text-blue-900 dark:text-blue-100">
               Your order will be delivered via courier service within{" "}
-              <span className="font-semibold">3-4 days</span>.
+              <span className="font-semibold">
+                {shippingLocation === "inside-dhaka" ? "1 day" : "2-3 days"}
+              </span>.
             </p>
           </div>
         </div>
