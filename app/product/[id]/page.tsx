@@ -278,6 +278,13 @@ export default function ProductPage({
         {/* Product Image - main + thumbnails (supports 1-5 images) */}
         <div className="space-y-3">
           <div className="relative bg-accent h-96 rounded-lg overflow-hidden flex items-center justify-center group">
+            {/* Discount Badge - Top Right */}
+            {product.discountPercent > 0 && (
+              <div className="absolute top-3 right-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-bold shadow-lg">
+                -{Math.round(product.discountPercent)}% OFF
+              </div>
+            )}
+
             <button
               aria-label="Previous image"
               onClick={() => setSelectedImageIndex((i) => Math.max(0, i - 1))}
@@ -420,45 +427,35 @@ export default function ProductPage({
         <div className="space-y-6">
 
           {/* Price */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <p className="text-muted-foreground">Price</p>
+          <div className="bg-accent/30 border border-border rounded-lg p-5 space-y-3">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Price</p>
+            <div className="flex items-center gap-4 flex-wrap">
               {product.discountPercent > 0 && (
-                <span className="bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
-                  -{Math.round(product.discountPercent)}% OFF
-                </span>
-              )}
-            </div>
-            <div className="space-y-2">
-              {product.discountPercent > 0 && (
-                <p className="text-2xl text-muted-foreground line-through">
+                <p className="text-xl text-muted-foreground/60 line-through">
                   ৳{product.mainPrice.toLocaleString("en-BD")}
                 </p>
               )}
-              <p className="text-4xl font-bold text-primary">
-                ৳
-                {(discount > 0
+              <p className="text-5xl font-bold text-primary">
+                ৳{(discount > 0
                   ? calculateFinalPrice()
                   : product.price
                 ).toLocaleString("en-BD")}
               </p>
-              {product.discountPercent > 0 && discount === 0 && (
-                <p className="text-green-600 font-semibold">
-                  You save: ৳
-                  {(product.mainPrice - product.price).toLocaleString("en-BD")}{" "}
-                  ({Math.round(product.discountPercent)}% off)
-                </p>
-              )}
-              {discount > 0 && (
-                <p className="text-green-600 font-semibold">
-                  Extra promo discount: ৳
-                  {(product.price - calculateFinalPrice()).toLocaleString(
-                    "en-BD"
-                  )}{" "}
-                  ({discount}% off with code)
-                </p>
-              )}
             </div>
+            {product.discountPercent > 0 && discount === 0 && (
+              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-md px-3 py-2">
+                <p className="text-green-700 dark:text-green-400 font-semibold text-sm">
+                  💰 You save ৳{(product.mainPrice - product.price).toLocaleString("en-BD")} ({Math.round(product.discountPercent)}% off)
+                </p>
+              </div>
+            )}
+            {discount > 0 && (
+              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-md px-3 py-2">
+                <p className="text-green-700 dark:text-green-400 font-semibold text-sm">
+                  🎉 Extra promo discount: ৳{(product.price - calculateFinalPrice()).toLocaleString("en-BD")} ({discount}% off with code)
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Stock Status */}
