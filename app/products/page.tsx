@@ -375,7 +375,7 @@ function ProductsContent() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Desktop Filters Sidebar */}
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
+          <div className="lg:sticky lg:top-28 lg:self-start">
             <FilterSidebar />
           </div>
         </aside>
