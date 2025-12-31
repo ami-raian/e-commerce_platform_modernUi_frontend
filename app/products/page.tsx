@@ -55,7 +55,7 @@ function ProductsContent() {
     }
 
     if (subCategory !== "all" && category === "fashion") {
-      params.set("subcategory", subCategory);
+      params.set("subCategory", subCategory);
     }
 
     if (sort !== "popularity") {
@@ -76,7 +76,7 @@ function ProductsContent() {
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1");
     const categoryFromUrl = searchParams.get("category") || "all";
-    const subCategoryFromUrl = searchParams.get("subcategory") || "all";
+    const subCategoryFromUrl = searchParams.get("subCategory") || searchParams.get("subcategory") || "all";
     const sortFromUrl = searchParams.get("sort") || "popularity";
 
     // Update local state to match URL
