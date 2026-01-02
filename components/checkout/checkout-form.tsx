@@ -134,13 +134,39 @@ export function CheckoutForm({
 
     try {
       // Create order in backend API
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
       const orderItems = cartItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
       }));
 
+      // Map payment method to API format
+      const paymentMethodMap: { [key: string]: string } = {
+        bkash: "bkash",
+        nagad: "nagad",
+        rocket: "rocket",
+        cod: "cash_on_delivery",
+      };
+
+      const orderPayload = {
+        userInfo: {
+          fullName: fullName,
+          email: formData.email,
+          phone: formData.phone,
+        },
+        orderItems: orderItems,
+        shippingAddress: {
+          fullName: fullName,
+          phone: formData.phone,
+          email: formData.email,
+          address: formData.address,
+          city: formData.city,
+        },
+        paymentMethod: paymentMethodMap[selectedPayment] || "cash_on_delivery",
+      };
+
       try {
-        await apiClient.post("/orders", { orderItems });
+        await apiClient.post("/orders", orderPayload);
       } catch (orderError) {
         console.error("Error creating order in backend:", orderError);
         // Continue with the flow even if backend order creation fails
