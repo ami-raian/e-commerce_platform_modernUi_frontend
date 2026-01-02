@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { ShoppingCart, Menu, X, Moon, Sun, Search } from "lucide-react";
+import { ShoppingCart, Menu, X, Moon, Sun, Search, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { useTheme } from "@/components/providers/theme-provider";
 import { useCartStore } from "@/lib/cart-store";
 import { useAuthStore } from "@/lib/auth-store";
@@ -22,6 +22,7 @@ export function Navbar() {
   const items = useCartStore((state) => state.items);
   const cartCount = items.reduce((total, item) => total + item.quantity, 0);
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   // Check if a route is active
   const isActive = (path: string) => {
@@ -43,6 +44,14 @@ export function Navbar() {
       setShowSearch(false);
     }
   };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+    setIsOpen(false);
+  };
+
+  const isAdmin = user?.role === "admin";
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
@@ -167,30 +176,40 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Auth Links */}
-          {/* {mounted && user ? (
-            <Link
-              href="/dashboard"
-              className={`transition-colors font-medium ${
-                isActive("/dashboard") || isActive("/admin")
-                  ? "text-primary font-semibold"
-                  : "text-foreground hover:text-primary"
-              }`}
-            >
-              {user.name.split(" ")[0]}
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className={`text-center px-4 py-2 text-sm ${
-                isActive("/login") || isActive("/register")
-                  ? "btn-primary opacity-90"
-                  : "btn-primary"
-              }`}
-            >
-              Sign In
-            </Link>
-          )} */}
+          {/* Admin Links - Desktop */}
+          {mounted && isAdmin && (
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                href="/dashboard"
+                className={`p-2 rounded-lg transition-colors flex items-center gap-2 ${
+                  isActive("/dashboard")
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-primary/10 hover:text-primary"
+                }`}
+                title="Dashboard"
+              >
+                <LayoutDashboard size={20} className={isActive("/dashboard") ? "stroke-[2.5]" : ""} />
+              </Link>
+              <Link
+                href="/admin"
+                className={`p-2 rounded-lg transition-colors flex items-center gap-2 ${
+                  isActive("/admin")
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-primary/10 hover:text-primary"
+                }`}
+                title="Admin Panel"
+              >
+                <ShieldCheck size={20} className={isActive("/admin") ? "stroke-[2.5]" : ""} />
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg transition-colors text-foreground hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
+                title="Logout"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -279,29 +298,48 @@ export function Navbar() {
           >
             About
           </Link>
-          {/* {mounted && user ? (
+
+          {/* Admin Links - Mobile */}
+          {mounted && isAdmin && (
             <>
-              <Link
-                href="/dashboard"
-                className={`transition-colors font-medium ${
-                  isActive("/dashboard")
-                    ? "text-primary font-semibold"
-                    : "text-foreground hover:text-primary"
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                My Dashboard
-              </Link>
+              <div className="border-t border-border pt-4 mt-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">
+                  Admin Menu
+                </p>
+                <Link
+                  href="/dashboard"
+                  className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors font-medium ${
+                    isActive("/dashboard")
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-foreground hover:bg-primary/10 hover:text-primary"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/admin"
+                  className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors font-medium mt-2 ${
+                    isActive("/admin")
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-foreground hover:bg-primary/10 hover:text-primary"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ShieldCheck size={18} />
+                  Admin Panel
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 py-2 px-3 rounded-lg transition-colors font-medium text-foreground hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 mt-2"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
             </>
-          ) : (
-            <Link
-              href="/login"
-              className="btn-primary text-center"
-              onClick={() => setIsOpen(false)}
-            >
-              Sign In
-            </Link>
-          )} */}
+          )}
         </div>
       )}
     </nav>

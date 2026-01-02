@@ -6,7 +6,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
-import { Trash2, Plus, Edit, AlertTriangle } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Edit,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import {
@@ -25,12 +32,15 @@ export default function AdminDashboard() {
   const authLoading = useAuthStore((state) => state.loading);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const products = useProductStore((state) => state.products);
+  const pagination = useProductStore((state) => state.pagination);
+  const loading = useProductStore((state) => state.loading);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
   const softDeleteProduct = useProductStore((state) => state.softDeleteProduct);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     // Wait for zustand to rehydrate from storage AND auth loading to finish
@@ -39,10 +49,13 @@ export default function AdminDashboard() {
     if (!user || user.role !== "admin") {
       router.push("/login");
     } else {
-      // Fetch products when admin dashboard loads
-      fetchProducts();
+      // Fetch products when admin dashboard loads with pagination
+      fetchProducts({
+        page: currentPage,
+        limit: 10,
+      });
     }
-  }, [user, authLoading, hasHydrated, router, fetchProducts]);
+  }, [user, authLoading, hasHydrated, router, fetchProducts, currentPage]);
 
   const handleEdit = (productId: string) => {
     router.push(`/admin/products/${productId}/edit`);
@@ -50,6 +63,11 @@ export default function AdminDashboard() {
 
   const handleAddProduct = () => {
     router.push("/admin/products/create");
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openDeleteModal = (product: Product) => {
@@ -155,7 +173,41 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {products.map((product) => (
+                  {loading ? (
+                    // Loading skeleton
+                    Array.from({ length: 10 }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-4 py-3">
+                          <div className="w-12 h-12 bg-muted rounded-md"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-32"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-20"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-10"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-16"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-12"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-6 bg-muted rounded w-16"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <div className="w-8 h-8 bg-muted rounded-lg"></div>
+                            <div className="w-8 h-8 bg-muted rounded-lg"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    products.map((product) => (
                     <tr
                       key={product._id}
                       className="hover:bg-accent/50 transition-colors"
@@ -251,7 +303,8 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -259,7 +312,36 @@ export default function AdminDashboard() {
 
           {/* Products Cards - Mobile/Tablet */}
           <div className="lg:hidden space-y-4">
-            {products.map((product) => (
+            {loading ? (
+              // Loading skeleton for mobile
+              Array.from({ length: 10 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-card border border-border rounded-lg p-4 shadow-sm animate-pulse"
+                >
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 bg-muted rounded-md shrink-0"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="h-5 bg-muted rounded w-3/4"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-2/3"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-6 bg-muted rounded w-16"></div>
+                        <div className="h-6 bg-muted rounded w-16"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-9 bg-muted rounded flex-1"></div>
+                        <div className="h-9 bg-muted rounded flex-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              products.map((product) => (
               <div
                 key={product._id}
                 className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
@@ -365,19 +447,102 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
-          <div className="mt-6 p-4 bg-card border border-border rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Products
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                {products.length}
-              </p>
+          {/* Pagination */}
+          {pagination && pagination.pages > 1 && (
+            <div className="mt-8">
+              {/* Results Count */}
+              <div className="flex items-center justify-center mb-4">
+                <p className="text-muted-foreground">
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  -{" "}
+                  <span className="font-semibold text-foreground">
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-foreground">
+                    {pagination.total}
+                  </span>{" "}
+                  products
+                </p>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="flex justify-center">
+                <div className="flex items-center gap-2">
+                  {/* Previous Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft size={16} />
+                    Previous
+                  </Button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                      .filter((page) => {
+                        // Show first page, last page, current page, and pages around current
+                        if (page === 1 || page === pagination.pages)
+                          return true;
+                        if (Math.abs(page - currentPage) <= 1) return true;
+                        return false;
+                      })
+                      .map((page, index, array) => {
+                        // Add ellipsis
+                        const prevPage = array[index - 1];
+                        const showEllipsis = prevPage && page - prevPage > 1;
+
+                        return (
+                          <div key={page} className="flex items-center gap-1">
+                            {showEllipsis && (
+                              <span className="px-2 text-muted-foreground">
+                                ...
+                              </span>
+                            )}
+                            <Button
+                              variant={
+                                currentPage === page ? "default" : "outline"
+                              }
+                              size="sm"
+                              onClick={() => handlePageChange(page)}
+                              className="min-w-10"
+                            >
+                              {page}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* Next Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.pages}
+                    className="gap-1"
+                  >
+                    Next
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

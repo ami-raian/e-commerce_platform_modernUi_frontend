@@ -15,7 +15,8 @@
       "Bash(copy:*)",
       "Bash(dir:*)",
       "Bash(timeout /t 3)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(Remove-Item \"e:\\\\frontend\\\\e-commerce_platform_modernUi_frontend\\\\app\\\\admin\\\\products\\\\page.tsx\" -Force)"
     ],
     "deny": [],
     "ask": []
