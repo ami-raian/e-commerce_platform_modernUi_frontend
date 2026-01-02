@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useCartStore } from "@/lib/cart-store";
-import { LogOut, ShoppingBag, User } from "lucide-react";
+import { apiClient } from "@/lib/api/config";
+import { LogOut, ShoppingBag, Package, User } from "lucide-react";
 import Link from "next/link";
 
 interface Order {
@@ -15,6 +16,11 @@ interface Order {
   status: "pending" | "completed" | "shipped";
 }
 
+interface OrderStats {
+  totalItems: number;
+  totalOrders: number;
+}
+
 export default function UserDashboard() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -23,6 +29,8 @@ export default function UserDashboard() {
   const logout = useAuthStore((state) => state.logout);
   const cartItems = useCartStore((state) => state.items);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -49,6 +57,27 @@ export default function UserDashboard() {
       },
     ]);
   }, []);
+
+  // Fetch order statistics from API
+  useEffect(() => {
+    const fetchOrderStats = async () => {
+      try {
+        setStatsLoading(true);
+        const response = await apiClient.get("/orders/total-items");
+        if (response.data.success) {
+          setOrderStats(response.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch order stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchOrderStats();
+    }
+  }, [user]);
 
   useEffect(() => {
     // Wait for zustand to rehydrate from storage AND auth loading to finish
@@ -112,30 +141,7 @@ export default function UserDashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary rounded-lg text-white">
-                  <ShoppingBag size={24} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-sm">Total Orders</p>
-                  <p className="text-2xl font-bold">{orders.length}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary rounded-lg text-white">
-                  <ShoppingBag size={24} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-sm">Cart Items</p>
-                  <p className="text-2xl font-bold">{cartItems.length}</p>
-                </div>
-              </div>
-            </div> */}
-
+            {/* Account Type Card */}
             <div className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-primary rounded-lg text-white">
@@ -144,6 +150,44 @@ export default function UserDashboard() {
                 <div>
                   <p className="text-muted-foreground text-sm">Account Type</p>
                   <p className="text-2xl font-bold capitalize">{user.role}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Orders Card */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-600 rounded-lg text-white">
+                  <ShoppingBag size={24} />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Total Orders</p>
+                  {statsLoading ? (
+                    <div className="h-8 w-16 bg-muted animate-pulse rounded mt-1"></div>
+                  ) : (
+                    <p className="text-2xl font-bold">
+                      {orderStats?.totalOrders ?? 0}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Total Items Ordered Card */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-600 rounded-lg text-white">
+                  <Package size={24} />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-sm">Items Ordered</p>
+                  {statsLoading ? (
+                    <div className="h-8 w-16 bg-muted animate-pulse rounded mt-1"></div>
+                  ) : (
+                    <p className="text-2xl font-bold">
+                      {orderStats?.totalItems ?? 0}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
