@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const products = useProductStore((state) => state.products);
   const pagination = useProductStore((state) => state.pagination);
+  const loading = useProductStore((state) => state.loading);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
   const softDeleteProduct = useProductStore((state) => state.softDeleteProduct);
@@ -172,7 +173,41 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {products.map((product) => (
+                  {loading ? (
+                    // Loading skeleton
+                    Array.from({ length: 10 }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-4 py-3">
+                          <div className="w-12 h-12 bg-muted rounded-md"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-32"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-20"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-10"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-16"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 bg-muted rounded w-12"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-6 bg-muted rounded w-16"></div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <div className="w-8 h-8 bg-muted rounded-lg"></div>
+                            <div className="w-8 h-8 bg-muted rounded-lg"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    products.map((product) => (
                     <tr
                       key={product._id}
                       className="hover:bg-accent/50 transition-colors"
@@ -268,7 +303,8 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -276,7 +312,36 @@ export default function AdminDashboard() {
 
           {/* Products Cards - Mobile/Tablet */}
           <div className="lg:hidden space-y-4">
-            {products.map((product) => (
+            {loading ? (
+              // Loading skeleton for mobile
+              Array.from({ length: 10 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-card border border-border rounded-lg p-4 shadow-sm animate-pulse"
+                >
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 bg-muted rounded-md shrink-0"></div>
+                    <div className="flex-1 space-y-3">
+                      <div className="h-5 bg-muted rounded w-3/4"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-2/3"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-6 bg-muted rounded w-16"></div>
+                        <div className="h-6 bg-muted rounded w-16"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-9 bg-muted rounded flex-1"></div>
+                        <div className="h-9 bg-muted rounded flex-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              products.map((product) => (
               <div
                 key={product._id}
                 className="bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
@@ -382,7 +447,8 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Pagination */}
