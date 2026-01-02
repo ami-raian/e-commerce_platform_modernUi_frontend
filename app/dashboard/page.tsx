@@ -3,18 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
-import { useCartStore } from "@/lib/cart-store";
 import { apiClient } from "@/lib/api/config";
-import { LogOut, ShoppingBag, Package, User } from "lucide-react";
-import Link from "next/link";
-
-interface Order {
-  id: string;
-  date: string;
-  total: number;
-  items: number;
-  status: "pending" | "completed" | "shipped";
-}
+import { ShoppingBag, Package, User } from "lucide-react";
 
 interface OrderStats {
   totalItems: number;
@@ -26,37 +16,8 @@ export default function UserDashboard() {
   const user = useAuthStore((state) => state.user);
   const authLoading = useAuthStore((state) => state.loading);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const logout = useAuthStore((state) => state.logout);
-  const cartItems = useCartStore((state) => state.items);
-  const [orders, setOrders] = useState<Order[]>([]);
   const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Initialize orders after mounting to avoid hydration mismatch
-    setOrders([
-      {
-        id: "ORD-001",
-        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0],
-        total: 299.99,
-        items: 3,
-        status: "completed",
-      },
-      {
-        id: "ORD-002",
-        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0],
-        total: 149.99,
-        items: 2,
-        status: "shipped",
-      },
-    ]);
-  }, []);
 
   // Fetch order statistics from API
   useEffect(() => {
@@ -74,10 +35,11 @@ export default function UserDashboard() {
       }
     };
 
-    if (user) {
+    // Only fetch when user is authenticated AND hydration is complete
+    if (user && hasHydrated && !authLoading) {
       fetchOrderStats();
     }
-  }, [user]);
+  }, [user, hasHydrated, authLoading]);
 
   useEffect(() => {
     // Wait for zustand to rehydrate from storage AND auth loading to finish
@@ -85,16 +47,14 @@ export default function UserDashboard() {
 
     if (!user) {
       router.push("/login");
+    } else {
+      // Scroll to top when dashboard loads
+      window.scrollTo(0, 0);
     }
   }, [user, authLoading, hasHydrated, router]);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
-
   // Show loading spinner while checking authentication or waiting for rehydration
-  if (!hasHydrated || authLoading || !mounted) {
+  if (!hasHydrated || authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -115,30 +75,6 @@ export default function UserDashboard() {
     <div className="min-h-screen bg-background py-8">
       <div className="container-xl">
         <div>
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-4xl font-serif font-bold text-primary">
-                Dashboard
-              </h1>
-              <p className="text-muted-foreground mt-2">Welcome, {user.name}</p>
-            </div>
-            <div className="flex gap-2">
-              {isAdmin && (
-                <Link href="/admin" className="btn-secondary">
-                  Admin Panel
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="btn-primary flex items-center gap-2"
-              >
-                <LogOut size={20} />
-                Logout
-              </button>
-            </div>
-          </div>
-
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Account Type Card */}
@@ -219,82 +155,6 @@ export default function UserDashboard() {
               </div>
             </div>
           </div>
-
-          {/* Recent Orders */}
-          {/* <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-border">
-              <h2 className="text-2xl font-serif font-bold">Recent Orders</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-accent">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium">
-                      Order ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">
-                      Items
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">
-                      Total
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.length > 0 ? (
-                    orders.map((order) => (
-                      <tr
-                        key={order.id}
-                        className="border-t border-border hover:bg-accent transition-colors"
-                      >
-                        <td className="px-6 py-4">{order.id}</td>
-                        <td className="px-6 py-4">{order.date}</td>
-                        <td className="px-6 py-4">{order.items}</td>
-                        <td className="px-6 py-4 font-semibold">
-                          ৳{order.total.toLocaleString('en-BD')}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              order.status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : order.status === "shipped"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-6 py-8 text-center text-muted-foreground"
-                      >
-                        No orders yet.{" "}
-                        <Link
-                          href="/products"
-                          className="text-primary hover:underline"
-                        >
-                          Start shopping
-                        </Link>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>
