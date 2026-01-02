@@ -6,7 +6,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 import { useProductStore, type Product } from "@/lib/product-store";
-import { Trash2, Plus, Edit, AlertTriangle } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Edit,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import {
@@ -25,12 +32,14 @@ export default function AdminDashboard() {
   const authLoading = useAuthStore((state) => state.loading);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const products = useProductStore((state) => state.products);
+  const pagination = useProductStore((state) => state.pagination);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
   const softDeleteProduct = useProductStore((state) => state.softDeleteProduct);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     // Wait for zustand to rehydrate from storage AND auth loading to finish
@@ -39,10 +48,13 @@ export default function AdminDashboard() {
     if (!user || user.role !== "admin") {
       router.push("/login");
     } else {
-      // Fetch products when admin dashboard loads
-      fetchProducts();
+      // Fetch products when admin dashboard loads with pagination
+      fetchProducts({
+        page: currentPage,
+        limit: 10,
+      });
     }
-  }, [user, authLoading, hasHydrated, router, fetchProducts]);
+  }, [user, authLoading, hasHydrated, router, fetchProducts, currentPage]);
 
   const handleEdit = (productId: string) => {
     router.push(`/admin/products/${productId}/edit`);
@@ -50,6 +62,11 @@ export default function AdminDashboard() {
 
   const handleAddProduct = () => {
     router.push("/admin/products/create");
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openDeleteModal = (product: Product) => {
@@ -368,16 +385,98 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          <div className="mt-6 p-4 bg-card border border-border rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Products
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                {products.length}
-              </p>
+          {/* Pagination */}
+          {pagination && pagination.pages > 1 && (
+            <div className="mt-8">
+              {/* Results Count */}
+              <div className="flex items-center justify-center mb-4">
+                <p className="text-muted-foreground">
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  -{" "}
+                  <span className="font-semibold text-foreground">
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-foreground">
+                    {pagination.total}
+                  </span>{" "}
+                  products
+                </p>
+              </div>
+
+              {/* Pagination Controls */}
+              <div className="flex justify-center">
+                <div className="flex items-center gap-2">
+                  {/* Previous Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft size={16} />
+                    Previous
+                  </Button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                      .filter((page) => {
+                        // Show first page, last page, current page, and pages around current
+                        if (page === 1 || page === pagination.pages)
+                          return true;
+                        if (Math.abs(page - currentPage) <= 1) return true;
+                        return false;
+                      })
+                      .map((page, index, array) => {
+                        // Add ellipsis
+                        const prevPage = array[index - 1];
+                        const showEllipsis = prevPage && page - prevPage > 1;
+
+                        return (
+                          <div key={page} className="flex items-center gap-1">
+                            {showEllipsis && (
+                              <span className="px-2 text-muted-foreground">
+                                ...
+                              </span>
+                            )}
+                            <Button
+                              variant={
+                                currentPage === page ? "default" : "outline"
+                              }
+                              size="sm"
+                              onClick={() => handlePageChange(page)}
+                              className="min-w-10"
+                            >
+                              {page}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* Next Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.pages}
+                    className="gap-1"
+                  >
+                    Next
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
