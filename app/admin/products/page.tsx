@@ -341,7 +341,10 @@ function ProductForm({
               min="0"
               value={formData.mainPrice}
               onChange={(e) =>
-                setFormData({ ...formData, mainPrice: parseFloat(e.target.value) })
+                setFormData({
+                  ...formData,
+                  mainPrice: parseFloat(e.target.value),
+                })
               }
               required
             />
