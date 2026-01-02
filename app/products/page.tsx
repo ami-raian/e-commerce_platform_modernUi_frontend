@@ -76,7 +76,10 @@ function ProductsContent() {
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1");
     const categoryFromUrl = searchParams.get("category") || "all";
-    const subCategoryFromUrl = searchParams.get("subCategory") || searchParams.get("subcategory") || "all";
+    const subCategoryFromUrl =
+      searchParams.get("subCategory") ||
+      searchParams.get("subcategory") ||
+      "all";
     const sortFromUrl = searchParams.get("sort") || "popularity";
 
     // Update local state to match URL
@@ -375,47 +378,13 @@ function ProductsContent() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Desktop Filters Sidebar */}
         <aside className="hidden lg:block">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="lg:sticky lg:top-[105px] lg:self-start">
             <FilterSidebar />
           </div>
         </aside>
 
         {/* Products Grid */}
         <div className="lg:col-span-3">
-          {/* Results Header */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-            <p className="text-muted-foreground">
-              {pagination ? (
-                <>
-                  Showing{" "}
-                  <span className="font-semibold text-foreground">
-                    {(pagination.page - 1) * pagination.limit + 1}
-                  </span>{" "}
-                  -{" "}
-                  <span className="font-semibold text-foreground">
-                    {Math.min(
-                      pagination.page * pagination.limit,
-                      pagination.total
-                    )}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-foreground">
-                    {pagination.total}
-                  </span>{" "}
-                  products
-                </>
-              ) : (
-                <>
-                  Showing{" "}
-                  <span className="font-semibold text-foreground">
-                    {products.length}
-                  </span>{" "}
-                  {products.length === 1 ? "product" : "products"}
-                </>
-              )}
-            </p>
-          </div>
-
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 12 }).map((_, index) => (
@@ -459,68 +428,100 @@ function ProductsContent() {
 
               {/* Pagination */}
               {pagination && pagination.pages > 1 && (
-                <div className="mt-12 flex justify-center">
-                  <div className="flex items-center gap-2">
-                    {/* Previous Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="gap-1"
-                    >
-                      <ChevronLeft size={16} />
-                      Previous
-                    </Button>
+                <div className="mt-12">
+                  {/* Results Count */}
+                  <div className="flex items-center justify-center mb-4">
+                    <p className="text-muted-foreground">
+                      Showing{" "}
+                      <span className="font-semibold text-foreground">
+                        {(pagination.page - 1) * pagination.limit + 1}
+                      </span>{" "}
+                      -{" "}
+                      <span className="font-semibold text-foreground">
+                        {Math.min(
+                          pagination.page * pagination.limit,
+                          pagination.total
+                        )}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-semibold text-foreground">
+                        {pagination.total}
+                      </span>{" "}
+                      products
+                    </p>
+                  </div>
 
-                    {/* Page Numbers */}
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: pagination.pages }, (_, i) => i + 1)
-                        .filter((page) => {
-                          // Show first page, last page, current page, and pages around current
-                          if (page === 1 || page === pagination.pages)
-                            return true;
-                          if (Math.abs(page - currentPage) <= 1) return true;
-                          return false;
-                        })
-                        .map((page, index, array) => {
-                          // Add ellipsis
-                          const prevPage = array[index - 1];
-                          const showEllipsis = prevPage && page - prevPage > 1;
+                  {/* Pagination Controls */}
+                  <div className="flex justify-center">
+                    <div className="flex items-center gap-2">
+                      {/* Previous Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="gap-1"
+                      >
+                        <ChevronLeft size={16} />
+                        Previous
+                      </Button>
 
-                          return (
-                            <div key={page} className="flex items-center gap-1">
-                              {showEllipsis && (
-                                <span className="px-2 text-muted-foreground">
-                                  ...
-                                </span>
-                              )}
-                              <Button
-                                variant={
-                                  currentPage === page ? "default" : "outline"
-                                }
-                                size="sm"
-                                onClick={() => handlePageChange(page)}
-                                className="min-w-[40px]"
+                      {/* Page Numbers */}
+                      <div className="flex items-center gap-1">
+                        {Array.from(
+                          { length: pagination.pages },
+                          (_, i) => i + 1
+                        )
+                          .filter((page) => {
+                            // Show first page, last page, current page, and pages around current
+                            if (page === 1 || page === pagination.pages)
+                              return true;
+                            if (Math.abs(page - currentPage) <= 1) return true;
+                            return false;
+                          })
+                          .map((page, index, array) => {
+                            // Add ellipsis
+                            const prevPage = array[index - 1];
+                            const showEllipsis =
+                              prevPage && page - prevPage > 1;
+
+                            return (
+                              <div
+                                key={page}
+                                className="flex items-center gap-1"
                               >
-                                {page}
-                              </Button>
-                            </div>
-                          );
-                        })}
-                    </div>
+                                {showEllipsis && (
+                                  <span className="px-2 text-muted-foreground">
+                                    ...
+                                  </span>
+                                )}
+                                <Button
+                                  variant={
+                                    currentPage === page ? "default" : "outline"
+                                  }
+                                  size="sm"
+                                  onClick={() => handlePageChange(page)}
+                                  className="min-w-10"
+                                >
+                                  {page}
+                                </Button>
+                              </div>
+                            );
+                          })}
+                      </div>
 
-                    {/* Next Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === pagination.pages}
-                      className="gap-1"
-                    >
-                      Next
-                      <ChevronRight size={16} />
-                    </Button>
+                      {/* Next Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === pagination.pages}
+                        className="gap-1"
+                      >
+                        Next
+                        <ChevronRight size={16} />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
