@@ -316,14 +316,6 @@ function ProductsContent() {
 
   return (
     <div className="container-xl py-8">
-      {/* Page Header */}
-      {/* <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">All Products</h1>
-        <p className="text-muted-foreground">
-          Explore our complete collection of premium products
-        </p>
-      </div> */}
-
       {/* Mobile Filter Button */}
       <div className="lg:hidden mb-6">
         <Button
@@ -538,15 +530,14 @@ function ProductsPageSkeleton() {
     <div className="container-xl py-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Skeleton */}
-        <aside className="hidden lg:block space-y-4">
+        {/* <aside className="hidden lg:block space-y-4">
           <div className="h-10 bg-muted rounded animate-pulse" />
           <div className="h-64 bg-muted rounded animate-pulse" />
           <div className="h-48 bg-muted rounded animate-pulse" />
-        </aside>
+        </aside> */}
 
         {/* Products Grid Skeleton */}
         <div className="lg:col-span-3">
-          <div className="h-10 bg-muted rounded mb-6 animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 12 }).map((_, index) => (
               <ProductCardSkeleton key={index} />
