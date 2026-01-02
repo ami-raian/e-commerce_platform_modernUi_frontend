@@ -530,11 +530,11 @@ function ProductsPageSkeleton() {
     <div className="container-xl py-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Skeleton */}
-        {/* <aside className="hidden lg:block space-y-4">
+        <aside className="hidden lg:block space-y-4">
           <div className="h-10 bg-muted rounded animate-pulse" />
           <div className="h-64 bg-muted rounded animate-pulse" />
           <div className="h-48 bg-muted rounded animate-pulse" />
-        </aside> */}
+        </aside>
 
         {/* Products Grid Skeleton */}
         <div className="lg:col-span-3">
