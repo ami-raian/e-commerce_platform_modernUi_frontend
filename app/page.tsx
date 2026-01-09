@@ -148,10 +148,11 @@ export default function HomePage() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2 md:h-3 rounded-full transition-all ${index === currentSlide
+              className={`h-2 md:h-3 rounded-full transition-all ${
+                index === currentSlide
                   ? "bg-white w-6 md:w-8"
                   : "w-2 md:w-3 bg-white/50 hover:bg-white/75"
-                }`}
+              }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -375,11 +376,12 @@ export default function HomePage() {
             </h2>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 max-w-2xl mx-auto px-2">
               Join thousands of happy customers across Bangladesh and experience
-              premium shopping today. Use code{" "}
+              premium shopping today. <br />
+              {/* Use code{" "}
               <span className="font-bold bg-white/20 px-2 md:px-3 py-0.5 md:py-1 rounded-lg inline-block">
                 WELCOME20
               </span>{" "}
-              at checkout. Cash on Delivery available!
+              at checkout. Cash on Delivery available! */}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4">
               <Link
