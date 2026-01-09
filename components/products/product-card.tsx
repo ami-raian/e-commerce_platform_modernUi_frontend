@@ -243,16 +243,22 @@ export function ProductCard({
               </div>
 
               {/* Size Buttons */}
-              <div>
-                <p className="text-sm font-medium mb-3 text-muted-foreground">
-                  Choose a size to continue
+              <div className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">👕</span>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    Select Size <span className="text-red-500">*</span>
+                  </p>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  Click on a size below to continue with your purchase
                 </p>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2">
                   {sizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => handleSizeSelection(size)}
-                      className="py-4 border-2 border-border rounded-lg font-semibold text-lg hover:border-primary hover:bg-accent transition-all hover:scale-105 active:scale-95"
+                      className="py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg font-bold text-base hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all hover:scale-105 active:scale-95 shadow-sm"
                     >
                       {size}
                     </button>
@@ -261,40 +267,40 @@ export function ProductCard({
               </div>
 
               {/* Size Chart */}
-              <div className="bg-accent/30 border border-border rounded-lg p-5">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700/50 border border-blue-200 dark:border-gray-600 rounded-lg p-4">
+                <h3 className="text-base font-bold mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                   <span>📏</span>
-                  Size Chart (in inches)
+                  Size Chart (inches)
                 </h3>
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b-2 border-border">
-                        <th className="text-left py-3 px-4 font-bold text-foreground">SIZE</th>
-                        <th className="text-center py-3 px-4 font-bold text-foreground">WIDTH</th>
-                        <th className="text-center py-3 px-4 font-bold text-foreground">LENGTH</th>
+                      <tr className="bg-white/60 dark:bg-gray-900/40">
+                        <th className="text-left py-2 px-3 font-semibold text-gray-900 dark:text-white rounded-tl-md">Size</th>
+                        <th className="text-center py-2 px-3 font-semibold text-gray-900 dark:text-white">Width</th>
+                        <th className="text-center py-2 px-3 font-semibold text-gray-900 dark:text-white rounded-tr-md">Length</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
-                        <td className="py-3 px-4 font-semibold text-lg">M</td>
-                        <td className="text-center py-3 px-4 text-lg">40</td>
-                        <td className="text-center py-3 px-4 text-lg">26</td>
+                    <tbody className="bg-white/40 dark:bg-gray-900/20">
+                      <tr className="hover:bg-blue-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="py-2 px-3 font-medium text-gray-900 dark:text-white">M</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">40</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">26</td>
                       </tr>
-                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
-                        <td className="py-3 px-4 font-semibold text-lg">L</td>
-                        <td className="text-center py-3 px-4 text-lg">41</td>
-                        <td className="text-center py-3 px-4 text-lg">27</td>
+                      <tr className="hover:bg-blue-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="py-2 px-3 font-medium text-gray-900 dark:text-white">L</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">41</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">27</td>
                       </tr>
-                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
-                        <td className="py-3 px-4 font-semibold text-lg">XL</td>
-                        <td className="text-center py-3 px-4 text-lg">42</td>
-                        <td className="text-center py-3 px-4 text-lg">28</td>
+                      <tr className="hover:bg-blue-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="py-2 px-3 font-medium text-gray-900 dark:text-white">XL</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">42</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">28</td>
                       </tr>
-                      <tr className="hover:bg-accent/50 transition-colors">
-                        <td className="py-3 px-4 font-semibold text-lg">XXL</td>
-                        <td className="text-center py-3 px-4 text-lg">44</td>
-                        <td className="text-center py-3 px-4 text-lg">29</td>
+                      <tr className="hover:bg-blue-100/50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="py-2 px-3 font-medium text-gray-900 dark:text-white rounded-bl-md">XXL</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300">44</td>
+                        <td className="text-center py-2 px-3 text-gray-700 dark:text-gray-300 rounded-br-md">29</td>
                       </tr>
                     </tbody>
                   </table>
