@@ -79,6 +79,7 @@ function SearchContent() {
                     image={getImageUrl(product.images?.[0] || product.image)}
                     category={product.category}
                     rating={product.rating}
+                    sizes={product.sizes}
                   />
                 </div>
               ))}

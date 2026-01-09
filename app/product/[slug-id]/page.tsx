@@ -58,6 +58,8 @@ export default function ProductPage({
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
+  const [sizeModalOpen, setSizeModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"buy" | "cart" | null>(null);
   const addItem = useCartStore((state) => state.addItem);
   const setDirectPurchaseItem = useCartStore(
     (state) => state.setDirectPurchaseItem
@@ -248,7 +250,8 @@ export default function ProductPage({
   const handleAddToCart = () => {
     // Validate size selection if product has sizes
     if (product.sizes.length > 0 && !selectedSize) {
-      toast.error("Please select a size before adding to cart");
+      setPendingAction("cart");
+      setSizeModalOpen(true);
       return;
     }
 
@@ -272,7 +275,8 @@ export default function ProductPage({
   const handleBuyNow = () => {
     // Validate size selection if product has sizes
     if (product.sizes.length > 0 && !selectedSize) {
-      toast.error("Please select a size before purchasing");
+      setPendingAction("buy");
+      setSizeModalOpen(true);
       return;
     }
 
@@ -298,6 +302,51 @@ export default function ProductPage({
     setTimeout(() => {
       router.push("/checkout");
     }, 500);
+  };
+
+  const handleSizeSelection = (size: string) => {
+    setSelectedSize(size);
+    setSizeModalOpen(false);
+
+    // Execute pending action
+    if (pendingAction === "buy") {
+      const purchaseItem = {
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        image:
+          product.images?.[0] ?? (product as any).image ?? "/placeholder.svg",
+        size: size,
+      };
+
+      setDirectPurchaseItem(purchaseItem);
+
+      toast.success("Redirecting to checkout...", {
+        duration: 1500,
+      });
+
+      setTimeout(() => {
+        router.push("/checkout");
+      }, 500);
+    } else if (pendingAction === "cart") {
+      addItem({
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        image:
+          product.images?.[0] ?? (product as any).image ?? "/placeholder.svg",
+        size: size,
+      });
+
+      toast.success(`${product.name} added to cart!`, {
+        description: `৳${product.price.toLocaleString("en-BD")} - Quantity: ${quantity} - Size: ${size}`,
+        duration: 2000,
+      });
+    }
+
+    setPendingAction(null);
   };
 
   return (
@@ -515,13 +564,21 @@ export default function ProductPage({
           {/* Size Selection */}
           {product.sizes.length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium">Select Size</p>
-                {selectedSize && (
-                  <span className="text-xs text-primary font-semibold">
-                    Selected: {selectedSize}
-                  </span>
-                )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium">Select Size</p>
+                  {selectedSize && (
+                    <span className="text-xs text-primary font-semibold">
+                      Selected: {selectedSize}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSizeModalOpen(true)}
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  View Size Chart
+                </button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
@@ -729,6 +786,100 @@ export default function ProductPage({
           >
             <span className="text-3xl">›</span>
           </button>
+        </div>
+      )}
+
+      {/* Size Selection Modal */}
+      {sizeModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setSizeModalOpen(false)}
+        >
+          <div
+            className="bg-background border border-border rounded-xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-background border-b border-border p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Select Your Size</h2>
+              <button
+                onClick={() => setSizeModalOpen(false)}
+                className="p-2 hover:bg-accent rounded-full transition-colors"
+                aria-label="Close modal"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Size Buttons */}
+              <div>
+                <p className="text-sm font-medium mb-3 text-muted-foreground">
+                  Choose a size to continue
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => handleSizeSelection(size)}
+                      className="py-4 border-2 border-border rounded-lg font-semibold text-lg hover:border-primary hover:bg-accent transition-all hover:scale-105 active:scale-95"
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Size Chart */}
+              <div className="bg-accent/30 border border-border rounded-lg p-5">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <span>📏</span>
+                  Size Chart (in inches)
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b-2 border-border">
+                        <th className="text-left py-3 px-4 font-bold text-foreground">SIZE</th>
+                        <th className="text-center py-3 px-4 font-bold text-foreground">WIDTH</th>
+                        <th className="text-center py-3 px-4 font-bold text-foreground">LENGTH</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-lg">M</td>
+                        <td className="text-center py-3 px-4 text-lg">40</td>
+                        <td className="text-center py-3 px-4 text-lg">26</td>
+                      </tr>
+                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-lg">L</td>
+                        <td className="text-center py-3 px-4 text-lg">41</td>
+                        <td className="text-center py-3 px-4 text-lg">27</td>
+                      </tr>
+                      <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-lg">XL</td>
+                        <td className="text-center py-3 px-4 text-lg">42</td>
+                        <td className="text-center py-3 px-4 text-lg">28</td>
+                      </tr>
+                      <tr className="hover:bg-accent/50 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-lg">XXL</td>
+                        <td className="text-center py-3 px-4 text-lg">44</td>
+                        <td className="text-center py-3 px-4 text-lg">29</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Help Text */}
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
+                <p className="text-sm text-blue-700 dark:text-blue-400">
+                  💡 <strong>Tip:</strong> Measure your favorite garment and compare with our size chart for the perfect fit!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
