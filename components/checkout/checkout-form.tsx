@@ -40,12 +40,10 @@ export function CheckoutForm({
     (state) => state.setDirectPurchaseItem
   );
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
     phone: "",
     address: "",
-    city: "",
   });
   const [selectedPayment, setSelectedPayment] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
@@ -59,17 +57,15 @@ export function CheckoutForm({
     setFormData(newFormData);
 
     const isValid =
-      newFormData.firstName.trim() &&
-      newFormData.lastName.trim() &&
+      newFormData.name.trim() &&
       newFormData.email.trim() &&
       newFormData.phone.trim() &&
-      newFormData.address.trim() &&
-      newFormData.city.trim();
+      newFormData.address.trim();
 
     setIsFormValid(!!isValid);
   };
 
-  const customerName = `${formData.firstName} ${formData.lastName}`;
+  const customerName = formData.name;
 
   const paymentOptions = [
     {
@@ -134,7 +130,7 @@ export function CheckoutForm({
 
     try {
       // Create order in backend API
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const fullName = formData.name.trim();
       const orderItems = cartItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -160,7 +156,7 @@ export function CheckoutForm({
           phone: formData.phone,
           email: formData.email,
           address: formData.address,
-          city: formData.city,
+          city: shippingLocation === "inside-dhaka" ? "Dhaka" : "Bangladesh",
         },
         paymentMethod: paymentMethodMap[selectedPayment] || "cash_on_delivery",
       };
@@ -183,7 +179,7 @@ export function CheckoutForm({
           email: formData.email,
           phone: formData.phone,
           address: formData.address,
-          city: formData.city,
+          city: shippingLocation === "inside-dhaka" ? "Dhaka" : "Bangladesh",
           cartItems: cartItems,
           subtotal: subtotal,
           promoDiscount: promoDiscount,
@@ -246,7 +242,7 @@ export function CheckoutForm({
           email: formData.email,
           phone: formData.phone,
           address: formData.address,
-          city: formData.city,
+          city: shippingLocation === "inside-dhaka" ? "Dhaka" : "Bangladesh",
           items: cartItems,
           subtotal,
           promoDiscount,
@@ -273,33 +269,26 @@ export function CheckoutForm({
       <div className="card">
         <h3 className="text-lg font-semibold mb-6">Shipping Information</h3>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="name">
+              Name <span className="text-red-500">*</span>
+            </Label>
             <Input
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               required
+              placeholder="Enter your full name"
               className="mt-2"
             />
           </div>
 
           <div>
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-              className="mt-2"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">
+              Email <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               name="email"
@@ -307,42 +296,37 @@ export function CheckoutForm({
               value={formData.email}
               onChange={handleChange}
               required
+              placeholder="your.email@example.com"
               className="mt-2"
             />
           </div>
 
-          <div className="col-span-2">
-            <Label htmlFor="phone">Phone</Label>
+          <div>
+            <Label htmlFor="phone">
+              Phone <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
+              placeholder="01XXXXXXXXX"
               className="mt-2"
             />
           </div>
 
-          <div className="col-span-2">
-            <Label htmlFor="address">Address</Label>
+          <div>
+            <Label htmlFor="address">
+              Address <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="address"
               name="address"
               value={formData.address}
               onChange={handleChange}
               required
-              className="mt-2"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              required
+              placeholder="House/Flat, Road, Area"
               className="mt-2"
             />
           </div>

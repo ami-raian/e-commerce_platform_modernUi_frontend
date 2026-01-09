@@ -35,12 +35,15 @@ export async function POST(req: NextRequest) {
     const orderData: OrderEmailData = await req.json();
 
     // Validate required fields
-    if (!orderData.customerName || !orderData.email || !orderData.cartItems) {
+    if (!orderData.customerName || !orderData.cartItems) {
       return NextResponse.json(
         { error: "Missing required order information" },
         { status: 400 }
       );
     }
+
+    // If email is missing or empty, skip customer email
+    const shouldSendCustomerEmail = orderData.email && orderData.email.trim() !== "";
 
     // Check if Resend API key is configured
     if (
@@ -73,26 +76,34 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    // Send email to customer
-    const customerEmailResult = await resend.emails.send({
-      from: "E-Commerce Store <onboarding@resend.dev>", // Change this to your verified domain
-      to: [orderData.email],
-      subject: "Order Confirmation - Thank you for your order!",
-      react: OrderConfirmationEmail({
-        ...orderData,
-        orderDate,
-      }),
-    });
-
     console.log("Admin email sent:", adminEmailResult);
-    console.log("Customer email sent:", customerEmailResult);
+
+    let customerEmailResult = null;
+
+    // Send email to customer only if email is provided
+    if (shouldSendCustomerEmail) {
+      customerEmailResult = await resend.emails.send({
+        from: "E-Commerce Store <onboarding@resend.dev>", // Change this to your verified domain
+        to: [orderData.email],
+        subject: "Order Confirmation - Thank you for your order!",
+        react: OrderConfirmationEmail({
+          ...orderData,
+          orderDate,
+        }),
+      });
+      console.log("Customer email sent:", customerEmailResult);
+    } else {
+      console.log("Customer email skipped - no email provided");
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Order confirmation emails sent successfully",
+        message: shouldSendCustomerEmail
+          ? "Order confirmation emails sent successfully"
+          : "Order confirmation email sent to admin (customer email not provided)",
         adminEmailId: adminEmailResult.data?.id,
-        customerEmailId: customerEmailResult.data?.id,
+        customerEmailId: customerEmailResult?.data?.id,
       },
       { status: 200 }
     );
