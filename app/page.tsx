@@ -193,6 +193,7 @@ export default function HomePage() {
                   image={getImageUrl(product.images[0])}
                   category={product.category}
                   rating={product.rating}
+                  sizes={product.sizes}
                 />
               </div>
             ))

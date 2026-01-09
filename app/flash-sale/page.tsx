@@ -119,6 +119,7 @@ export default function FlashSalePage() {
                       image={getImageUrl(product.images[0])}
                       category={product.category}
                       rating={product.rating}
+                      sizes={product.sizes}
                     />
                     {/* Original Price */}
                     <div className="absolute top-[220px] left-8 bg-card/90 backdrop-blur-sm px-3 py-1 rounded-lg">

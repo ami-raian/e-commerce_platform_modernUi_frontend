@@ -13,28 +13,44 @@ import { useCartStore } from '@/lib/cart-store';
 
 export function CheckoutTracker() {
   const items = useCartStore((state) => state.items);
+  const directPurchaseItem = useCartStore((state) => state.directPurchaseItem);
   const getTotal = useCartStore((state) => state.getTotal);
   const getItemCount = useCartStore((state) => state.getItemCount);
 
   useEffect(() => {
-    if (items.length === 0) return;
+    // Use direct purchase item if available, otherwise use cart items
+    const checkoutItems = directPurchaseItem ? [directPurchaseItem] : items;
+
+    if (checkoutItems.length === 0) return;
 
     // Prepare contents data
-    const contents = items.map((item) => ({
+    const contents = checkoutItems.map((item) => ({
       id: item.productId,
       quantity: item.quantity,
       item_price: item.price,
     }));
 
-    const contentIds = items.map((item) => item.productId);
+    const contentIds = checkoutItems.map((item) => item.productId);
+
+    // Calculate total value
+    const totalValue = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Calculate total quantity
+    const totalQuantity = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
 
     // Track InitiateCheckout event
     trackInitiateCheckout({
       content_ids: contentIds,
       contents: contents,
-      num_items: getItemCount(),
-      value: getTotal(),
+      num_items: totalQuantity,
+      value: totalValue,
       currency: 'BDT',
+    });
+
+    console.log('[Meta Pixel] InitiateCheckout tracked:', {
+      num_items: totalQuantity,
+      value: totalValue,
+      content_ids: contentIds,
     });
   }, []); // Only track once on mount
 
