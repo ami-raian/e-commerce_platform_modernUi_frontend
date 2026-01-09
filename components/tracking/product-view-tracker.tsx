@@ -26,10 +26,9 @@ export function ProductViewTracker({ product }: ProductViewTrackerProps) {
   useEffect(() => {
     if (!product || !product.id || !product.name) return;
 
-    // Calculate actual price after discount
-    const actualPrice = product.discountPercentage
-      ? product.price * (1 - product.discountPercentage / 100)
-      : product.price;
+    // product.price is already the discounted price, so use it directly
+    // Do NOT apply discount percentage again as that would double-discount
+    const actualPrice = product.price;
 
     // Track ViewContent event
     trackViewContent({
@@ -41,7 +40,7 @@ export function ProductViewTracker({ product }: ProductViewTrackerProps) {
       currency: "BDT",
     });
 
-    console.log("[Meta Pixel] ViewContent tracked for:", product.name);
+    console.log("[Meta Pixel] ViewContent tracked for:", product.name, "Price:", actualPrice);
   }, [
     product.id,
     product.name,
